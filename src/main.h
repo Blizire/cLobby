@@ -5,6 +5,7 @@
 #include <Windows.h>
 #include <winuser.h>
 #include <wingdi.h>
+#include <windef.h>
 #include "bitmap.h"
 
 #endif /* MAIN_H */

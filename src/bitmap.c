@@ -1,5 +1,48 @@
 #include "bitmap.h"
 
+/*
+void errhandler(char * func, HWND hwnd){
+    //printf("bitmap file: error (%s)\n", func);
+    wchar_t buf[256];
+    FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
+                buf, (sizeof(buf) / sizeof(wchar_t)), NULL);
+}
+*/
+
+void errhandler(LPTSTR lpszFunction) 
+{ 
+    // Retrieve the system error message for the last-error code
+
+    LPVOID lpMsgBuf;
+    LPVOID lpDisplayBuf;
+    DWORD dw = GetLastError(); 
+
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &lpMsgBuf,
+        0, NULL );
+
+    // Display the error message and exit the process
+
+    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
+        (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR)); 
+    StringCchPrintf((LPTSTR)lpDisplayBuf, 
+        LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+        TEXT("%s failed with error %d: %s"), 
+        lpszFunction, dw, lpMsgBuf); 
+    MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK); 
+
+    LocalFree(lpMsgBuf);
+    LocalFree(lpDisplayBuf);
+    ExitProcess(dw); 
+}
+
 PBITMAPINFO CreateBitmapInfoStruct(HWND hwnd, HBITMAP hBmp)
 { 
     BITMAP bmp; 
@@ -80,14 +123,14 @@ PBITMAPINFO CreateBitmapInfoStruct(HWND hwnd, HBITMAP hBmp)
     lpBits = (LPBYTE) GlobalAlloc(GMEM_FIXED, pbih->biSizeImage);
 
     if (!lpBits) 
-         errhandler("GlobalAlloc", hwnd); 
+         errhandler("GlobalAlloc"); 
 
     // Retrieve the color table (RGBQUAD array) and the bits  
     // (array of palette indices) from the DIB.  
     if (!GetDIBits(hDC, hBMP, 0, (WORD) pbih->biHeight, lpBits, pbi, 
         DIB_RGB_COLORS)) 
     {
-        errhandler("GetDIBits", hwnd); 
+        errhandler("GetDIBits"); 
     }
 
     // Create the .BMP file.  
@@ -99,7 +142,7 @@ PBITMAPINFO CreateBitmapInfoStruct(HWND hwnd, HBITMAP hBmp)
                    FILE_ATTRIBUTE_NORMAL, 
                    (HANDLE) NULL); 
     if (hf == INVALID_HANDLE_VALUE) 
-        errhandler("CreateFile", hwnd); 
+        errhandler("CreateFile"); 
     hdr.bfType = 0x4d42;        // 0x42 = "B" 0x4d = "M"  
     // Compute the size of the entire file.  
     hdr.bfSize = (DWORD) (sizeof(BITMAPFILEHEADER) + 
@@ -117,24 +160,24 @@ PBITMAPINFO CreateBitmapInfoStruct(HWND hwnd, HBITMAP hBmp)
     if (!WriteFile(hf, (LPVOID) &hdr, sizeof(BITMAPFILEHEADER), 
         (LPDWORD) &dwTmp,  NULL)) 
     {
-       errhandler("WriteFile", hwnd); 
+       errhandler("WriteFile"); 
     }
 
     // Copy the BITMAPINFOHEADER and RGBQUAD array into the file.  
     if (!WriteFile(hf, (LPVOID) pbih, sizeof(BITMAPINFOHEADER) 
                   + pbih->biClrUsed * sizeof (RGBQUAD), 
                   (LPDWORD) &dwTmp, ( NULL)))
-        errhandler("WriteFile", hwnd); 
+        errhandler("WriteFile"); 
 
     // Copy the array of color indices into the .BMP file.  
     dwTotal = cb = pbih->biSizeImage; 
     hp = lpBits; 
     if (!WriteFile(hf, (LPSTR) hp, (int) cb, (LPDWORD) &dwTmp,NULL)) 
-           errhandler("WriteFile", hwnd); 
+           errhandler("WriteFile"); 
 
     // Close the .BMP file.  
      if (!CloseHandle(hf)) 
-           errhandler("CloseHandle", hwnd); 
+           errhandler("CloseHandle"); 
 
     // Free memory.  
     GlobalFree((HGLOBAL)lpBits);

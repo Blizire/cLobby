@@ -10,6 +10,8 @@ int main(int argc, char * argv[]){
     HDC hdcCapture;
     HBITMAP bmpOld;
     HBITMAP bitmap;
+    PBITMAPINFO bmpHeaders;
+    LPRECT windowCords = calloc(1, sizeof(LPRECT));
 
     // find window to screen cap
     windowHandle =  FindWindowA(NULL, "*Untitled - Notepad");
@@ -21,7 +23,7 @@ int main(int argc, char * argv[]){
     }
 
     // set window into foreground
-    SetForegroundWindow(windowHandle);
+    //SetForegroundWindow(windowHandle);
 
     // get device contect for window
     hdcHandle = GetWindowDC(windowHandle);
@@ -36,8 +38,14 @@ int main(int argc, char * argv[]){
     hdcCapture = CreateCompatibleDC(hdcHandle);
 
     // obtain w/h info from dc
-    width = GetDeviceCaps(hdcHandle, HORZRES);
-    height = GetDeviceCaps(hdcHandle, VERTRES);
+    //width = GetDeviceCaps(hdcHandle, HORZRES);
+    //height = GetDeviceCaps(hdcHandle, VERTRES);
+    GetWindowRect(windowHandle, windowCords);
+    width = windowCords->right - windowCords->left;
+    height = windowCords->bottom - windowCords->top;
+
+
+
 
     // makes empty bitmap based of original dc
     bitmap = CreateCompatibleBitmap(hdcHandle, width, height);
@@ -56,6 +64,12 @@ int main(int argc, char * argv[]){
 
     // done drawing (BitBlt'ing) so must return original
     SelectObject(hdcCapture, bmpOld);
+
+    // create info struct to  write to file
+    bmpHeaders = CreateBitmapInfoStruct((HWND)NULL, bitmap);
+
+    // save file to disk
+    CreateBMPFile((HWND)NULL, "image.bmp", bmpHeaders, bitmap, hdcCapture);
 
     // clean up memory
     DeleteObject(bitmap);
