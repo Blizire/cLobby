@@ -1,5 +1,5 @@
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef SCREENSHOT_H
+#define SCREENSHOT_H
 
 #include <stdio.h>
 #include <Windows.h>
@@ -8,4 +8,6 @@
 #include <windef.h>
 #include "bitmap.h"
 
-#endif /* MAIN_H */
+int screenshot(char * imageName, char * windowName);
+
+#endif /* SCREENSHOT_H */

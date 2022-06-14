@@ -1,15 +1,5 @@
 #include "bitmap.h"
 
-/*
-void errhandler(char * func, HWND hwnd){
-    //printf("bitmap file: error (%s)\n", func);
-    wchar_t buf[256];
-    FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
-                buf, (sizeof(buf) / sizeof(wchar_t)), NULL);
-}
-*/
-
 void errhandler(LPTSTR lpszFunction) 
 { 
     // Retrieve the system error message for the last-error code
@@ -51,7 +41,7 @@ PBITMAPINFO CreateBitmapInfoStruct(HWND hwnd, HBITMAP hBmp)
 
     // Retrieve the bitmap color format, width, and height.  
     if (!GetObject(hBmp, sizeof(BITMAP), (LPSTR)&bmp)) 
-        errhandler("GetObject", hwnd); 
+        errhandler("GetObject"); 
 
     // Convert the color format to a count of bits.  
     cClrBits = (WORD)(bmp.bmPlanes * bmp.bmBitsPixel); 
