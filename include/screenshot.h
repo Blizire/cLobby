@@ -8,6 +8,6 @@
 #include <windef.h>
 #include "bitmap.h"
 
-int screenshot(char * imageName, char * windowName);
+unsigned long long screenshot(COLORREF **rgbArray, char *windowName);
 
 #endif /* SCREENSHOT_H */

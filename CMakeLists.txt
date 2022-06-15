@@ -8,4 +8,3 @@ include_directories(include)
 file(GLOB SOURCES "src/*.c")
 
 add_executable(vision ${SOURCES})
-#add_executable(vision src/main.c src/main.h src/bitmap.c src/bitmap.h src/screenshot.c src/screenshot.h)
