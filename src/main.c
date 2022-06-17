@@ -71,13 +71,11 @@ int main(){
     {
         int diff = 1;
         double diffAverage = 0;
-        
+        // continously get screen data and compare the buffer.
+        BitBlt(dcScreenCapture, 0, 0, width, height, windowDCHandle, 0, 0, SRCCOPY);
+        GetDIBits(dcScreenCapture, bitmap, 0, height, activeBuffer, &bmi, DIB_RGB_COLORS);
         for(int i = 0; i < rgbArraySize; i++)
         {
-            // continously get screen data and compare the buffer.
-            BitBlt(dcScreenCapture, 0, 0, width, height, windowDCHandle, 0, 0, SRCCOPY);            
-            GetDIBits(dcScreenCapture, bitmap, 0, height, activeBuffer, &bmi, DIB_RGB_COLORS);
-
             // compare buffers and increase diff score
             if( idleBuffer[i].rgbRed != activeBuffer[i].rgbRed
                 || idleBuffer[i].rgbGreen != activeBuffer[i].rgbGreen
@@ -89,8 +87,6 @@ int main(){
         }
 
         // if the active buffer is different we have detected a great enough change to act on
-        printf("average difference : %f\n diff : %i\n", diffAverage, diff);
-
         if(diffAverage > 0.70){
             free(idleBuffer);
             free(activeBuffer);    
