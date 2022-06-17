@@ -84,11 +84,11 @@ int main(){
                 || idleBuffer[i].rgbBlue != activeBuffer[i].rgbBlue)
             {            
                 diff++;
+                diffAverage = (double)diff / (double)rgbArraySize;
             }
         }
 
         // if the active buffer is different we have detected a great enough change to act on
-        diffAverage = (double)diff / (double)rgbArraySize;
         printf("average difference : %f\n diff : %i\n", diffAverage, diff);
 
         if(diffAverage > 0.70){
