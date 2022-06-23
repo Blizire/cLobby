@@ -7,4 +7,4 @@ project(Vision VERSION 1.0
 include_directories(include)
 file(GLOB SOURCES "src/*.c")
 
-add_executable(vision ${SOURCES})
+add_executable(vision WIN32 ${SOURCES})
